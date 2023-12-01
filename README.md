@@ -8,7 +8,7 @@
 Temperature Balancing is a "model diagnostic" based layer-wise adaptive learning rate scheduler.
 Most deep neural networks have complex multilayer structures, often seen as a barrier to transparency. 
 In our research, we reveal a significant insight: these layers are not uniformly well-trained. 
-Our approach introduces a "model diagnostic" tool to identify underperforming layers, and address them by improving training.
+Our approach introduces a "model diagnostic" tool to identify underperforming layers, and address them by adjust layer-wise learning rate for improved training.
 We demonstrate its effectiveness across various benchmarks, datasets, and network architectures, outperforming more than five existing methods, all rooted in our ability to dissect and diagnose network imbalances.
 <!--
 ![Block](assert/TB_system_design_v3.png)-->
