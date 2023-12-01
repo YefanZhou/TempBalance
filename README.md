@@ -20,11 +20,11 @@ We demonstrate its effectiveness across various benchmarks, datasets, and networ
 ## Dataset and Environment Setup
 
 ```bash
-# install TinyImageNet
 conda create -n ww_train python=3.8
 conda activate ww_train
 pip install -r requirements.txt
 
+# install TinyImageNet
 export data_path=PATH_TO_DATA
 bash dataset_setup.sh
 ```
