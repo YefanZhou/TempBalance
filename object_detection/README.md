@@ -8,7 +8,7 @@
 ```
 
 ## Dataset setup
-Find the 'TESTVOC2007.yaml', 'VALVOC2007.yaml' and 'VOC2007.yaml' three files in the directory [YOLOv8/ultralytics/datasets](https://github.com/YefanZhou/TempBalance/object_detection/src/YOLOv8/ultralytics/datasets), and put the path (absolute path) in <PUT_YOUR_PATH_HERE>. If datasets are not exist, they will be downloaded and unzipped automatically.
+Find the 'TESTVOC2007.yaml', 'VALVOC2007.yaml' and 'VOC2007.yaml' three files in the directory [YOLOv8/ultralytics/datasets](https://github.com/YefanZhou/TempBalance/tree/main/object_detection/src/YOLOv8/ultralytics/datasets), and put the path (absolute path) in <PUT_YOUR_PATH_HERE>. If datasets are not exist, they will be downloaded and unzipped automatically.
 
 ## Run Training scripts
 ```bash
@@ -32,7 +32,7 @@ Find the 'TESTVOC2007.yaml', 'VALVOC2007.yaml' and 'VOC2007.yaml' three files in
 ## Acknowledgement
 1. [Yuanzhe Hu](https://github.com/HUST-AI-HYZ) is the main contributor to the object detection implementation.
 2. We thank the open-sourced package [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics).
-2. For hyperparameters not specified in the provided bash scripts, please refer to the defaults set in  [runtrain.py](https://github.com/YefanZhou/TempBalance/object_detection/src/YOLOv8/runtrain.py). 
+2. For hyperparameters not specified in the provided bash scripts, please refer to the defaults set in  [runtrain.py](https://github.com/YefanZhou/TempBalance/blob/main/object_detection/src/YOLOv8/runtrain.py). 
 3. The original hyperparameter 'Optimizer' in Ultralytics Code is replaced by 'optim_type'.
 
 

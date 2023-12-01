@@ -48,8 +48,11 @@ optimizer = optim.SGD(
 # training loop
 for epoch in range(1, ...):
     ...
-    optimizer.step()
+    train()
+    test()
+    # get global decayed learning rate
     untuned_global_lr = some_torch_lr_scheduler(epoch)
+    # temperature balancing
     tb_scheduler.step(optimizer, untuned_global_lr)
     ...
 ```
@@ -95,16 +98,16 @@ bash bash_scripts/ablation/metric_ablation.sh
 
 
 ## Other tasks
-Preliminary implementation of applying TempBalance to [language modeling](https://github.com/YefanZhou/TempBalance/language_modeling) and [object detection](https://github.com/YefanZhou/TempBalance/object_detection), under development.
+Preliminary implementation of applying TempBalance to [language modeling](https://github.com/YefanZhou/TempBalance/tree/main/language_modeling) and [object detection](https://github.com/YefanZhou/TempBalance/tree/main/object_detection), under development.
 
 
 ## Acknowledgement
 
-We thank the open-sourced package [weightwatcher](https://github.com/CalculatedContent/WeightWatcher/tree/master), [pytorch-optimizer](https://github.com/jettify/pytorch-optimizer), [adamp](https://github.com/clovaai/AdamP).
+We thank the open-sourced packages [weightwatcher](https://github.com/CalculatedContent/WeightWatcher/tree/master), [pytorch-optimizer](https://github.com/jettify/pytorch-optimizer), [adamp](https://github.com/clovaai/AdamP).
+
 
 ## Citation
 We would appreciate it if you could cite the following paper if you found the repository useful for your work:
-
 
 ```bash
 @inproceedings{zhou2023temperature,
