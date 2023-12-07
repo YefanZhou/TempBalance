@@ -50,8 +50,8 @@ for epoch in range(1, ...):
     ...
     train()
     test()
-    # get global decayed learning rate
-    untuned_global_lr = some_torch_lr_scheduler(epoch)
+    # get global decayed learning rate (optimizer lr should not be updated here)
+    untuned_global_lr = some_lr_decay_function(epoch)
     # temperature balancing
     tb_scheduler.step(optimizer, untuned_global_lr)
     ...
