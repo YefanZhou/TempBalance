@@ -10,7 +10,7 @@ export OMP_NUM_THREADS=1
 
 cd ${src_path}/BTD-Transformer/
 
-for SLURM_ARRAY_TASK_ID in {2..6..1}
+for SLURM_ARRAY_TASK_ID in {7..11..1}
     do
         cfg=$(sed -n "$SLURM_ARRAY_TASK_ID"p ${src_path}/BTD-Transformer/scripts/txt/ptb_tb.txt)
 

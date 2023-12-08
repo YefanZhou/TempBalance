@@ -443,6 +443,15 @@ logging('#non emb params = {}'.format(args.n_nonemb_param))
 logging('#self attention params = {}'.format(args.self_attention_param))
 
 
+for index, param_group in enumerate(optimizer.param_groups):
+    if index <= all_count - 1:
+        print(f"old lr: {param_group['lr']}, new lr: {all_params_lr[index]}")
+        param_group['lr'] = all_params_lr[index]
+    else:
+        print(f"old lr: {param_group['lr']}, new lr: {untuned_lr}")
+        param_group['lr'] = untuned_lr
+
+
 def cosine_decay(init, epoch, total_epoch):
     epoch = min(epoch, total_epoch)
     cosine_decay = 0.5 * (1 + math.cos(np.pi * epoch / total_epoch))
