@@ -19,6 +19,7 @@ class Tempbalance(object):
                     filter_zeros=False,
                     remove_first_layer=True,
                     remove_last_layer=True,
+                    eigs_thresh=50,
                     esd_metric_for_tb='alpha',
                     assign_func='tb_linear_map',
                     lr_min_ratio=0.5,
@@ -52,6 +53,7 @@ class Tempbalance(object):
         self.filter_zeros = filter_zeros
         self.remove_first_layer = remove_first_layer
         self.remove_last_layer = remove_last_layer
+        self.eigs_thresh = eigs_thresh
         self.esd_metric_for_tb = esd_metric_for_tb
         self.assign_func = assign_func
         self.lr_min_ratio = lr_min_ratio
@@ -128,6 +130,10 @@ class Tempbalance(object):
             # index must be reset otherwise may delete the wrong row 
             layer_stats.index = list(range(len(layer_stats[self.esd_metric_for_tb])))
         
+        # remove layers with number of eigs less than a threshold
+        layer_stats = layer_stats[layer_stats['eigs_num'] >= self.eigs_thresh]
+        layer_stats.index = list(range(len(layer_stats[self.esd_metric_for_tb])))
+        
         metric_scores = np.array(layer_stats[self.esd_metric_for_tb])
         scheduled_lr = self.get_layer_temps(assign_func=self.assign_func, 
                                             metric_scores=metric_scores, 
@@ -202,7 +208,8 @@ class Tempbalance(object):
             'D': [],
             'longname':[],
             'eigs':[],
-            'norm':[]
+            'norm':[],
+            'eigs_num':[]
             }
         if verbose:
             print("=================================")
@@ -289,6 +296,7 @@ class Tempbalance(object):
                 results['D'].append(final_D)
                 results['longname'].append(name)
                 results['eigs'].append(eigs.detach().cpu().numpy())
+                results['eigs_num'].append(len(eigs))
         
         return results
     
