@@ -25,7 +25,8 @@ class Tempbalance(object):
                     lr_min_ratio=0.5,
                     lr_max_ratio=1.5,
                     batchnorm=True,
-                    batchnorm_type='name'
+                    batchnorm_type='name',
+                    layernorm=False
                     ):
         """init function
         Args:
@@ -43,6 +44,8 @@ class Tempbalance(object):
             lr_min_ratio (float, ):      learning rate lower bound. Defaults to 0.5.
             lr_max_ratio (float, ):       learning rate upper bound. Defaults to 1.5.
             batchnorm (bool, ):          whether adjust batch norm learning rate using TB. Defaults to True.
+            batchnorm_type (str, ):      how to set learning rate for batchnorm layers
+            layernorm (bool, ):          whether adjust layer norm learning rate using TB. Defaults to True.
         """
         self.net = net
         self.EVALS_THRESH = EVALS_THRESH
@@ -59,7 +62,9 @@ class Tempbalance(object):
         self.lr_min_ratio = lr_min_ratio
         self.lr_max_ratio = lr_max_ratio
         self.batchnorm = batchnorm
-        
+        self.layernorm = layernorm
+        self.bn_to_conv = {}
+        self.ln_to_linear = {}
         # print('EVALS_THRESH',  self.EVALS_THRESH, type(self.EVALS_THRESH) )
         # print('bins',  self.bins, type(self.bins) )
         # print('conv_norm',  self.conv_norm, type(self.conv_norm) )
@@ -74,8 +79,7 @@ class Tempbalance(object):
         # print('lr_max_ratio',  self.lr_max_ratio, type(self.lr_max_ratio) )
         # print('batchnorm',  self.batchnorm, type(self.batchnorm) )
         
-        self.bn_to_conv = {}
-        if batchnorm_type == 'name':
+        if batchnorm and batchnorm_type == 'name':
             # let the batch norm layer change lr corresponding to the layer
             # with the same layer name 
             longname_lst = []
@@ -87,7 +91,7 @@ class Tempbalance(object):
                         and name.replace('bn', 'conv') in longname_lst:
                     self.bn_to_conv[name] = name.replace('bn', 'conv')
                     
-        elif batchnorm_type == 'order':
+        elif batchnorm and batchnorm_type == 'order':
             # let the batch norm layer change lr corresponding to the 
             # conv layer before current layer
             longname_lst = []
@@ -97,16 +101,24 @@ class Tempbalance(object):
                     longname_lst.append(name)
                     type_lst.append('nn.Conv2d')
                 if isinstance(module, nn.BatchNorm2d):
-                    if 'nn.Conv2d' == type_lst[-1]:
+                    if type_lst[-1] == 'nn.Conv2d':
                         self.bn_to_conv[name] = longname_lst[-1]
                     longname_lst.append(name)
                     type_lst.append('nn.BatchNorm2d')
         
-        print(f'initialize which layer to follow for each batch norm layer, type= {batchnorm_type}')
-        print('--------------------')
-        for key in self.bn_to_conv:
-            print(f"{key} -> {self.bn_to_conv[key]}")
-        print('--------------------')
+        if self.layernorm:
+            longname_lst = []
+            type_lst = []
+            for name, module in self.net.named_modules():
+                if isinstance(module, nn.Linear):
+                    longname_lst.append(name)
+                    type_lst.append('nn.Linear')
+                if isinstance(module, nn.LayerNorm):
+                    if type_lst[-1] == 'nn.Linear':
+                        self.ln_to_linear[name] = longname_lst[-1]
+                    longname_lst.append(name)
+                    type_lst.append('nn.LayerNorm')
+            
         
     def build_optimizer_param_group(self, untuned_lr=0.1, initialize=True):
         """build the parameter group for optimizer
@@ -171,6 +183,19 @@ class Tempbalance(object):
                     opt_params_groups.append({'params': module.parameters(), 'lr': scheduled_lr})
                 else:
                     # append tuned learning rate 
+                    opt_params_groups.append(scheduled_lr)
+                layer_count += 1
+            
+            elif self.layernorm \
+                and isinstance(module, nn.LayerNorm) \
+                    and name in self.ln_to_linear \
+                        and self.ln_to_linear[name] in layer_name_to_tune:
+                
+                params_to_tune_ids += list(map(id, module.parameters()))
+                scheduled_lr = layer_stats[layer_stats['longname'] == self.ln_to_linear[name]]['scheduled_lr'].item()
+                if initialize:
+                    opt_params_groups.append({'params': module.parameters(), 'lr': scheduled_lr})
+                else:
                     opt_params_groups.append(scheduled_lr)
                 layer_count += 1
         
