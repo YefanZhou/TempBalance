@@ -126,16 +126,16 @@ class SGDSNR(Optimizer):
 
                 if weight_decay != 0:
                     d_p = d_p.add(p, alpha=weight_decay)
-                else:
-                    if spectrum_regularization != 0:
-                        #print("spectrum_regularization", spectrum_regularization, p.dim())
-                        if p.dim() > 1:
-                            d_p = d_p.add(torch.reshape(compute_weight(p.to(device)), p.shape),
-                                            alpha=spectrum_regularization)
-                        else:
-                            pass
+                
+                if spectrum_regularization != 0:
+                    #print("spectrum_regularization", spectrum_regularization, p.dim())
+                    if p.dim() > 1:
+                        d_p = d_p.add(torch.reshape(compute_weight(p.to(device)), p.shape),
+                                        alpha=spectrum_regularization)
                     else:
                         pass
+                else:
+                    pass
 
                 if momentum != 0:
                     param_state = self.state[p]
